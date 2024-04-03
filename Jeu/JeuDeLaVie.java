@@ -150,16 +150,19 @@ public class JeuDeLaVie implements Observable{
 
     public static void main(String args[]){
         JeuDeLaVie jeu = new JeuDeLaVie(150, 150);
-        Visiteur visiteur = new VisiteurClassique(jeu);
+        Visiteur visiteur = new VisiteurHighLife(jeu);
         jeu.setVisiteur(visiteur);
 
-        JeuDeLaVieUI ui = new JeuDeLaVieUI(jeu);
+        Observateur ui = new JeuDeLaVieUI(jeu);
+        Observateur stats = new JeuDeLaVieStats(jeu);
+        
         jeu.attacheObservateur(ui);
+        jeu.attacheObservateur(stats);
 
         while(true){
             jeu.calculerGenerationSuivante();
             try{
-                TimeUnit.MILLISECONDS.sleep(250);
+                TimeUnit.MILLISECONDS.sleep(500);
             }catch(InterruptedException e){}
         }
     }
