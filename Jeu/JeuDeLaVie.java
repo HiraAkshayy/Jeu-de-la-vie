@@ -154,10 +154,18 @@ public class JeuDeLaVie implements Observable, Observateur{
         commandes.clear();
     }
 
+    /**
+     * Méthode qui ajoute une commande à la liste d'attente des commandes
+     * @param c Commande à ajouter
+     */
     public void ajouteCommandeJeu(CommandeJeu c){
         commandesJeu.add(c);
     }
 
+    /**
+     * Méthode qui exécute toutes les commandes de la liste
+     * puis vide la liste
+     */
     public void executeCommandesJeu(){
         for(CommandeJeu c: commandesJeu){
             c.executer();
@@ -217,6 +225,9 @@ public class JeuDeLaVie implements Observable, Observateur{
                     TimeUnit.MILLISECONDS.sleep(jeu.delai);
                 }catch(InterruptedException e){}
             }
+            try{
+                TimeUnit.MILLISECONDS.sleep(50);
+            }catch(InterruptedException e){}
             jeu.executeCommandesJeu();
         }
     }

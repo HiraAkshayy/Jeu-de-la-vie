@@ -13,7 +13,7 @@ import Jeu.*;
 public class JeuDeLaVieParams extends JFrame{
     private final int VIT_MIN = 100;
     private final int VIT_MAX = 1000;
-    private final int VIT_INIT = 500;
+    private final int VIT_INIT = 450;
 
     private JeuDeLaVie jeu;
     private boolean on;
@@ -36,6 +36,8 @@ public class JeuDeLaVieParams extends JFrame{
         boutonOn = new JButton("Marche/Arrêt");
         boutonNextGen = new JButton("Next");
         vitSlider = new JSlider(VIT_MIN, VIT_MAX, VIT_INIT);
+        vitSlider.setPaintLabels(true);
+        vitSlider.setPaintTicks(true);
 
         /*
          * Ajout d'une action pour chaque bouton et le slider
@@ -47,7 +49,7 @@ public class JeuDeLaVieParams extends JFrame{
         vitSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e){
                 JSlider source = (JSlider)e.getSource();
-                jeu.setDelai((int)source.getValue());
+                jeu.setDelai(VIT_MAX - (int)source.getValue());
             }
         });
 
