@@ -4,6 +4,10 @@ import Jeu.*;
 import java.awt.*;
 import javax.swing.*;
 
+/**
+ * Classe qui représente l'interface graphique du jeu (affichage des cellules 
+ * au fil des générations)
+ */
 public class JeuDeLaVieUI extends JFrame implements Observateur{
     private JeuDeLaVie jeu;
 

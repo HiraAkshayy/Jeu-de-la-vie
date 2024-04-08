@@ -8,21 +8,31 @@ import Cell.*;
 import UI.*;
 import Regles.*;
 
-public class JeuDeLaVie implements Observable{
+/**
+ * Classe qui représente un jeu de la vie (automate cellulaire)
+ */
+public class JeuDeLaVie implements Observable, Observateur{
     private Cellule[][] grille;
     private int xMax, yMax;
     private Visiteur visiteur;
+    private boolean marche;
+    private int delai;
 
     private List<Observateur> observateurs;
     private List<Commande> commandes;
+    private List<CommandeJeu> commandesJeu;
 
     public JeuDeLaVie(int x, int y){
         xMax = x;
         yMax = y;
         grille = new Cellule[xMax][yMax];
+
+        marche = true;
+        delai = 500;
         
         observateurs = new ArrayList<>();
         commandes = new ArrayList<>();
+        commandesJeu = new ArrayList<>();
 
         initialiseGrille();
     }
@@ -41,6 +51,25 @@ public class JeuDeLaVie implements Observable{
      */
     public int getYMax(){
         return yMax;
+    }
+
+    /**
+     * Méthode qui inverse l'état de marche actuel
+     */
+    public void marcheArret(){
+        marche = marche ? false : true;
+    }
+
+    /**
+     * Méthode qui renvoie si le jeu est actuellement en marche ou non
+     * @return un boolean qui indique si le jeu est en marche
+     */
+    public boolean isOn(){
+        return marche;
+    }
+
+    public void setDelai(int d){
+        delai = d;
     }
 
     /**
@@ -99,6 +128,13 @@ public class JeuDeLaVie implements Observable{
     }
 
     /**
+     * Méthode qui actualise les paramètres du jeu
+     */
+    public void actualise(){
+
+    }
+
+    /**
      * Méthode qui ajoute une commande à la liste d'attente des commandes
      * @param c Commande à ajouter
      */
@@ -116,6 +152,18 @@ public class JeuDeLaVie implements Observable{
         }
 
         commandes.clear();
+    }
+
+    public void ajouteCommandeJeu(CommandeJeu c){
+        commandesJeu.add(c);
+    }
+
+    public void executeCommandesJeu(){
+        for(CommandeJeu c: commandesJeu){
+            c.executer();
+        }
+
+        commandesJeu.clear();
     }
 
     /**
@@ -150,20 +198,26 @@ public class JeuDeLaVie implements Observable{
 
     public static void main(String args[]){
         JeuDeLaVie jeu = new JeuDeLaVie(150, 150);
-        Visiteur visiteur = new VisiteurHighLife(jeu);
+        Visiteur visiteur = new VisiteurClassique(jeu);
         jeu.setVisiteur(visiteur);
 
         Observateur ui = new JeuDeLaVieUI(jeu);
         Observateur stats = new JeuDeLaVieStats(jeu);
+        new JeuDeLaVieParams(jeu);
         
         jeu.attacheObservateur(ui);
         jeu.attacheObservateur(stats);
 
+        jeu.notifieObservateurs();
+
         while(true){
-            jeu.calculerGenerationSuivante();
-            try{
-                TimeUnit.MILLISECONDS.sleep(500);
-            }catch(InterruptedException e){}
+            if(jeu.isOn()){
+                jeu.calculerGenerationSuivante();
+                try{
+                    TimeUnit.MILLISECONDS.sleep(jeu.delai);
+                }catch(InterruptedException e){}
+            }
+            jeu.executeCommandesJeu();
         }
     }
 }

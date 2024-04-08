@@ -3,6 +3,10 @@ package Cell;
 import Jeu.*;
 import Regles.*;
 
+/**
+ * Classe qui représente une cellule du jeu de la vie.
+ * Une cellule peut mourir ou naître, et on connaît son état actuel
+ */
 public class Cellule {
     private CelluleEtat etat;
     private int x, y;

@@ -2,13 +2,18 @@ package UI;
 
 import Jeu.JeuDeLaVie;
 
+/**
+ * Classe qui représente les statistiques actuelles du jeu
+ * (à quelle génération on est et combien de cellules sont vivantes pendant
+ * cette génération)
+ */
 public class JeuDeLaVieStats implements Observateur{
     private JeuDeLaVie jeu;
     private int genCourante;
 
     public JeuDeLaVieStats(JeuDeLaVie jeu){
         this.jeu = jeu;
-        this.genCourante = 1;
+        this.genCourante = 0;
     }
 
     public void actualise(){
