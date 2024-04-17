@@ -4,9 +4,16 @@ import Cell.*;
 import Jeu.JeuDeLaVie;
 
 public class VisiteurClassique extends Visiteur{
+    private static VisiteurClassique visiteurClassique = null;
     
-    public VisiteurClassique(JeuDeLaVie jeu){
+    private VisiteurClassique(JeuDeLaVie jeu){
         super(jeu);
+    }
+
+    public static VisiteurClassique getInstance(JeuDeLaVie jeu){
+        if(visiteurClassique == null)
+            visiteurClassique = new VisiteurClassique(jeu);
+        return visiteurClassique;
     }
 
     public void visiteCelluleVivante(Cellule cellule){

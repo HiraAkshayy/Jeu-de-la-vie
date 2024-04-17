@@ -18,6 +18,7 @@ public class JeuDeLaVieUI extends JFrame implements Observateur{
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(jeu.getXMax()*3, jeu.getYMax()*3);
         this.setResizable(false);
+        this.setLocationRelativeTo(null);
         this.setVisible(true);
     }
 

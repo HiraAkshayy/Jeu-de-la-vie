@@ -2,7 +2,6 @@ package Jeu;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import Cell.*;
 import UI.*;
@@ -16,25 +15,46 @@ public class JeuDeLaVie implements Observable, Observateur{
     private int xMax, yMax;
     private Visiteur visiteur;
     private boolean marche;
-    private int delai;
+    public int delai;
+    private double densite;
+    private int genNum;
+
+    private JeuDeLaVieParams params;
 
     private List<Observateur> observateurs;
     private List<Commande> commandes;
-    private List<CommandeJeu> commandesJeu;
 
-    public JeuDeLaVie(int x, int y){
+    /**
+     * Constructeur du jeu de la vie
+     * @param x largeur maximum de la grille
+     * @param y hauteur maximum de la grille
+     * @param d densité de la grille initiale (de 0 à 1 => 0% à 100%)
+     * @param ui le jeu doit être affiché
+     * @param stats les statistiques doivent être affichées (dans la console)
+     * @param params les paramètres peuvent être changés
+     */
+    public JeuDeLaVie(int x, int y, double d, boolean ui, boolean stats, boolean params){
         xMax = x;
         yMax = y;
+        densite = d;
         grille = new Cellule[xMax][yMax];
 
-        marche = true;
+        marche = false;
         delai = 500;
         
         observateurs = new ArrayList<>();
         commandes = new ArrayList<>();
-        commandesJeu = new ArrayList<>();
 
         initialiseGrille();
+
+        if(ui)
+            attacheObservateur(new JeuDeLaVieUI(this));
+        if(stats)
+            attacheObservateur(new JeuDeLaVieStats(this));
+        if(params){
+            this.params = new JeuDeLaVieParams(this);
+            this.params.attacheObservateur(this);
+        }
     }
 
     /**
@@ -72,6 +92,14 @@ public class JeuDeLaVie implements Observable, Observateur{
         delai = d;
     }
 
+    public int getDelai(){
+        return delai;
+    }
+
+    public int getGen(){
+        return genNum;
+    }
+
     /**
      * Méthode qui initialise la grille du JeuDeLaVie avec des cellules
      * vivantes ou mortes (la sélection de l'état des cellules est aléatoire)
@@ -79,7 +107,7 @@ public class JeuDeLaVie implements Observable, Observateur{
     public void initialiseGrille(){
         for(int x = 0; x < xMax; x++){
             for(int y = 0; y < yMax; y++){
-                if(Math.random() < 0.5){
+                if(Math.random() < densite){
                     grille[x][y] = new Cellule(x, y, CelluleEtatVivant.getEtat());
                 }
                 else{
@@ -87,6 +115,7 @@ public class JeuDeLaVie implements Observable, Observateur{
                 }
             }
         }
+        genNum = 0;
     }
 
     /**
@@ -128,10 +157,28 @@ public class JeuDeLaVie implements Observable, Observateur{
     }
 
     /**
-     * Méthode qui actualise les paramètres du jeu
+     * Méthode qui actualise les éléments du jeu
      */
     public void actualise(){
+        this.actualiseParams();
+    }
 
+    /**
+     * Méthode qui actualise les paramètres du jeu
+     */
+    public void actualiseParams(){
+        this.delai = params.getDelai();
+
+        if(params.getEtatMarche())
+            this.marcheArret();
+
+        if(params.getEtatNext())
+            this.calculerGenerationSuivante();
+        
+        if(params.getEtatRestart())
+            this.initialiseGrille();
+
+        this.setVisiteur(params.getRegle());
     }
 
     /**
@@ -152,26 +199,6 @@ public class JeuDeLaVie implements Observable, Observateur{
         }
 
         commandes.clear();
-    }
-
-    /**
-     * Méthode qui ajoute une commande à la liste d'attente des commandes
-     * @param c Commande à ajouter
-     */
-    public void ajouteCommandeJeu(CommandeJeu c){
-        commandesJeu.add(c);
-    }
-
-    /**
-     * Méthode qui exécute toutes les commandes de la liste
-     * puis vide la liste
-     */
-    public void executeCommandesJeu(){
-        for(CommandeJeu c: commandesJeu){
-            c.executer();
-        }
-
-        commandesJeu.clear();
     }
 
     /**
@@ -199,36 +226,9 @@ public class JeuDeLaVie implements Observable, Observateur{
      * jeu
      */
     public void calculerGenerationSuivante(){
+        genNum++;
         distribueVisiteur();
         executeCommandes();
         notifieObservateurs();
-    }
-
-    public static void main(String args[]){
-        JeuDeLaVie jeu = new JeuDeLaVie(150, 150);
-        Visiteur visiteur = new VisiteurClassique(jeu);
-        jeu.setVisiteur(visiteur);
-
-        Observateur ui = new JeuDeLaVieUI(jeu);
-        Observateur stats = new JeuDeLaVieStats(jeu);
-        new JeuDeLaVieParams(jeu);
-        
-        jeu.attacheObservateur(ui);
-        jeu.attacheObservateur(stats);
-
-        jeu.notifieObservateurs();
-
-        while(true){
-            if(jeu.isOn()){
-                jeu.calculerGenerationSuivante();
-                try{
-                    TimeUnit.MILLISECONDS.sleep(jeu.delai);
-                }catch(InterruptedException e){}
-            }
-            try{
-                TimeUnit.MILLISECONDS.sleep(50);
-            }catch(InterruptedException e){}
-            jeu.executeCommandesJeu();
-        }
     }
 }

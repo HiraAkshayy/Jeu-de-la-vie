@@ -4,9 +4,16 @@ import Jeu.JeuDeLaVie;
 import Cell.*;
 
 public class VisiteurDayNight extends Visiteur{
+    public static VisiteurDayNight visiteurDayNight = null;
     
-    public VisiteurDayNight(JeuDeLaVie jeu){
+    private VisiteurDayNight(JeuDeLaVie jeu){
         super(jeu);
+    }
+
+    public static VisiteurDayNight getInstance(JeuDeLaVie jeu){
+        if(visiteurDayNight == null)
+            visiteurDayNight = new VisiteurDayNight(jeu);
+        return visiteurDayNight;
     }
 
     public void visiteCelluleVivante(Cellule cellule){

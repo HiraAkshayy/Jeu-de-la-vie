@@ -9,15 +9,13 @@ import Jeu.JeuDeLaVie;
  */
 public class JeuDeLaVieStats implements Observateur{
     private JeuDeLaVie jeu;
-    private int genCourante;
 
     public JeuDeLaVieStats(JeuDeLaVie jeu){
         this.jeu = jeu;
-        this.genCourante = 0;
     }
 
     public void actualise(){
-        System.out.println("La génération courante est "+ (++genCourante));
+        System.out.println("La génération courante est "+ jeu.getGen());
         System.out.println("Il y a "+ nombreCellulesVivantes() +" cellules vivantes actuellement\n");
     }
 
